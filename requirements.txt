@@ -1,0 +1,10 @@
+langchain-core
+langchain-openai
+langchain-community
+langchain-postgres
+langchain-text-splitters
+pypdf
+psycopg[binary]
+pgvector
+python-dotenv
+pytest
