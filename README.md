@@ -68,7 +68,7 @@ docker compose ps
 Coloque o arquivo `document.pdf` na raiz do projeto e execute:
 
 ```bash
-python src/services/ingest_service.py
+python src/ingest.py
 ```
 
 Saída esperada:
@@ -139,16 +139,12 @@ pdf-ingest-langchain/
 ├── document.pdf              # PDF a ser ingerido (não versionado)
 ├── docs/                     # Especificações do projeto
 ├── src/
-│   ├── config/
-│   │   └── settings.py       # Clientes OpenAI e PGVector
-│   ├── services/
-│   │   ├── ingest_service.py # Ingestão do PDF
-│   │   └── search_service.py # Busca e resposta via LLM
+│   ├── ingest.py             # Ingestão do PDF
+│   ├── search.py             # Busca e resposta via LLM
 │   └── chat.py               # Entrypoint CLI
 └── tests/
-    ├── test_settings.py
-    ├── test_ingest_service.py
-    ├── test_search_service.py
+    ├── test_ingest.py
+    ├── test_search.py
     └── test_chat.py
 ```
 

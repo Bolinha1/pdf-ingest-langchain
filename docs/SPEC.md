@@ -21,7 +21,7 @@ Sistema CLI em Python capaz de:
 
 | ID   | Caso de Uso              | Descrição                                                                 |
 |------|--------------------------|---------------------------------------------------------------------------|
-| UC-1 | Ingerir PDF              | Usuário executa `python src/services/ingest_service.py` e o PDF é processado e armazenado |
+| UC-1 | Ingerir PDF              | Usuário executa `python src/ingest.py` e o PDF é processado e armazenado |
 | UC-2 | Fazer pergunta           | Usuário executa `python src/chat.py` e digita perguntas em loop                            |
 | UC-3 | Receber resposta         | Sistema retorna resposta baseada apenas no conteúdo do PDF                |
 | UC-4 | Pergunta fora do escopo  | Sistema responde com mensagem padrão de "sem informação"                  |
@@ -127,17 +127,13 @@ pdf-ingest-langchain/
 │   ├── ARCHITECTURE.md       # Arquitetura e fluxo entre módulos
 │   └── CONTRACTS.md          # Assinaturas de funções e schemas
 ├── src/
-│   ├── config/               # Camada de configuração e conexões externas
-│   │   └── settings.py       # Instâncias de banco, embeddings e LLM
-│   ├── services/             # Camada de serviços (regras de negócio)
-│   │   ├── ingest_service.py # UC-1: lê PDF, chunking, embeddings, persiste
-│   │   └── search_service.py # UC-2/3: busca vetorial e montagem de resposta
-│   └── chat.py               # Entrypoint CLI — orquestra services e exibe resposta
+│   ├── ingest.py             # UC-1: configuração + lê PDF, chunking, embeddings, persiste
+│   ├── search.py             # UC-2/3: configuração + busca vetorial e montagem de resposta
+│   └── chat.py               # Entrypoint CLI — orquestra search e exibe resposta
 ├── tests/                    # Testes automatizados (TDD)
 │   ├── __init__.py
-│   ├── test_settings.py      # Testa instanciação de embeddings, LLM e vector_store
-│   ├── test_ingest_service.py# Testa load_pdf, split_documents, store_embeddings, run_ingestion
-│   ├── test_search_service.py# Testa search_chunks, build_prompt, ask_llm, answer_question
+│   ├── test_ingest.py        # Testa env vars, load_pdf, split_documents, store_embeddings, run_ingestion
+│   ├── test_search.py        # Testa search_chunks, build_prompt, ask_llm, answer_question
 │   └── test_chat.py          # Testa comportamentos do entrypoint CLI
 └── README.md                 # Instruções de execução
 ```
@@ -159,7 +155,7 @@ chat.py  →  services/  →  config/  →  [PostgreSQL | OpenAI API]
 
 | ID    | Critério                                                                 | Verificação                          |
 |-------|--------------------------------------------------------------------------|--------------------------------------|
-| AC-1  | `ingest_service.py` processa o PDF sem erros                                     | Execução sem exceção + log de chunks |
+| AC-1  | `ingest.py` processa o PDF sem erros                                             | Execução sem exceção + log de chunks |
 | AC-2  | Vetores são gravados no banco e consultáveis                              | Query direta no PostgreSQL           |
 | AC-3  | `chat.py` responde perguntas dentro do escopo com base no PDF            | Teste manual com perguntas válidas   |
 | AC-4  | Perguntas fora do escopo retornam a mensagem padrão (literal)            | Teste manual com perguntas inválidas |

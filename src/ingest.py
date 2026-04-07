@@ -1,13 +1,33 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-
+from dotenv import load_dotenv
+from langchain_openai import OpenAIEmbeddings
+from langchain_postgres import PGVector
 from langchain_core.documents import Document
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from config.settings import vector_store
+load_dotenv()
+
+_api_key = os.getenv("OPENAI_API_KEY")
+_db_url = os.getenv("DATABASE_URL")
+
+if not _api_key:
+    raise EnvironmentError("OPENAI_API_KEY não definida no ambiente.")
+if not _db_url:
+    raise EnvironmentError("DATABASE_URL não definida no ambiente.")
+
+embeddings = OpenAIEmbeddings(
+    model="text-embedding-3-small",
+    api_key=_api_key,
+)
+
+vector_store = PGVector(
+    embeddings=embeddings,
+    collection_name="pdf_documents",
+    connection=_db_url,
+)
 
 
 def load_pdf(path: str) -> list[Document]:

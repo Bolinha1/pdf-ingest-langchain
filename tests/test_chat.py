@@ -2,9 +2,8 @@ import sys
 from unittest.mock import MagicMock, patch
 import pytest
 
-# Inject mock settings before the import chain resolves
-sys.modules.setdefault("config", MagicMock())
-sys.modules.setdefault("config.settings", MagicMock())
+# Inject mock for search module before chat imports it
+sys.modules.setdefault("search", MagicMock())
 
 import chat  # noqa: E402
 
