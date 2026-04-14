@@ -36,12 +36,23 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edite o `.env` com suas credenciais:
+Edite o `.env` com suas credenciais e configurações:
 
 ```env
 OPENAI_API_KEY=sk-...
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/vectordb
+PG_VECTOR_COLLECTION_NAME=pdf_documents
+PDF_PATH=document.pdf
 ```
+
+| Variável | Descrição |
+|---|---|
+| `OPENAI_API_KEY` | Chave de API da OpenAI |
+| `OPENAI_EMBEDDING_MODEL` | Modelo de embeddings a utilizar |
+| `DATABASE_URL` | Connection string do PostgreSQL |
+| `PG_VECTOR_COLLECTION_NAME` | Nome da collection no pgVector |
+| `PDF_PATH` | Caminho do PDF a ser ingerido |
 
 > O `.env` está no `.gitignore` e nunca será commitado.
 
