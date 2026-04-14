@@ -8,7 +8,10 @@ from langchain_core.documents import Document
 
 _VALID_ENV = {
     "OPENAI_API_KEY": "sk-test-key",
+    "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small",
     "DATABASE_URL": "postgresql+psycopg://user:pass@localhost:5432/testdb",
+    "PG_VECTOR_COLLECTION_NAME": "pdf_documents",
+    "PDF_PATH": "document.pdf",
 }
 
 
@@ -59,7 +62,7 @@ def test_instantiates_with_valid_env():
 
 
 def test_raises_without_api_key():
-    env = {"DATABASE_URL": "postgresql+psycopg://user:pass@localhost:5432/testdb"}
+    env = {k: v for k, v in _VALID_ENV.items() if k != "OPENAI_API_KEY"}
     with (
         patch.dict(os.environ, env, clear=True),
         patch("dotenv.load_dotenv"),
@@ -71,7 +74,7 @@ def test_raises_without_api_key():
 
 
 def test_raises_without_database_url():
-    env = {"OPENAI_API_KEY": "sk-test-key"}
+    env = {k: v for k, v in _VALID_ENV.items() if k != "DATABASE_URL"}
     with (
         patch.dict(os.environ, env, clear=True),
         patch("dotenv.load_dotenv"),

@@ -7,7 +7,10 @@ from langchain_core.documents import Document
 
 _VALID_ENV = {
     "OPENAI_API_KEY": "sk-test-key",
+    "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small",
     "DATABASE_URL": "postgresql+psycopg://user:pass@localhost:5432/testdb",
+    "PG_VECTOR_COLLECTION_NAME": "pdf_documents",
+    "PDF_PATH": "document.pdf",
 }
 
 # Remove any stale mock installed by test_chat.py (alphabetically imported first)
