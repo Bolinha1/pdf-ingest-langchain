@@ -27,7 +27,7 @@ embeddings = OpenAIEmbeddings(
 )
 
 llm = ChatOpenAI(
-    model="gpt-5-nano",
+    model="gpt-4o-mini",
     api_key=_api_key,
 )
 

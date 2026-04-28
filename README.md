@@ -47,7 +47,7 @@ PDF_PATH=document.pdf
 ```
 
 | Variável | Descrição |
-|---|---|
+| --- | --- |
 | `OPENAI_API_KEY` | Chave de API da OpenAI |
 | `OPENAI_EMBEDDING_MODEL` | Modelo de embeddings a utilizar |
 | `DATABASE_URL` | Connection string do PostgreSQL |
@@ -84,7 +84,7 @@ python src/ingest.py
 
 Saída esperada:
 
-```
+```text
 Carregando PDF: document.pdf
 Páginas carregadas: 12
 Chunks gerados: 47
@@ -104,7 +104,7 @@ python src/chat.py
 
 Saída esperada:
 
-```
+```text
 Sistema de perguntas sobre PDF. Digite 'exit' ou 'quit' para sair.
 
 PERGUNTA: Qual é o tema principal do documento?
@@ -116,7 +116,7 @@ Encerrando. Até logo!
 
 O sistema responde **somente com base no conteúdo do PDF**. Para perguntas fora do escopo:
 
-```
+```text
 PERGUNTA: Qual é a capital da França?
 RESPOSTA: Não tenho informações necessárias para responder sua pergunta.
 ```
@@ -133,7 +133,7 @@ Os testes são unitários e não requerem banco ou chave de API — todas as dep
 
 Saída esperada:
 
-```
+```text
 26 passed in 0.89s
 ```
 
@@ -141,7 +141,7 @@ Saída esperada:
 
 ## Estrutura do projeto
 
-```
+```text
 pdf-ingest-langchain/
 ├── docker-compose.yml        # PostgreSQL + pgVector
 ├── requirements.txt
@@ -165,8 +165,8 @@ pdf-ingest-langchain/
 
 | Função     | Modelo                  |
 |------------|-------------------------|
-| Embeddings | `text-embedding-3-small` |
-| LLM        | `gpt-5-nano`            |
+| Embeddings | `text-embedding-3-small`  |
+| LLM        | `gpt-4o-mini`             |
 
 ---
 
