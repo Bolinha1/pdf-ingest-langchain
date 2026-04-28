@@ -8,9 +8,9 @@ Este documento define os **contratos de cada função** do sistema — assinatur
 
 ---
 
-## 1. `config/settings.py`
+## 1. `src/ingest.py` e `src/search.py` — Configuração inline
 
-Não expõe funções — expõe **instâncias** prontas para uso pelas camadas superiores.
+Cada script inicializa e expõe **instâncias** prontas no topo do módulo.
 
 ### Objetos exportados
 
@@ -51,7 +51,7 @@ vector_store = PGVector(
 
 ---
 
-## 2. `services/ingest_service.py`
+## 2. `src/ingest.py`
 
 ### 2.1 `load_pdf`
 
@@ -128,7 +128,7 @@ Ingestão concluída com sucesso.
 
 ---
 
-## 3. `services/search_service.py`
+## 3. `src/search.py`
 
 ### 3.1 `search_chunks`
 
@@ -282,13 +282,11 @@ from dotenv import load_dotenv
 
 Cada módulo possui um arquivo de teste correspondente. Dependências externas (LLM, embeddings, banco) devem ser mockadas — os testes são unitários e não requerem serviços rodando.
 
-### `tests/test_settings.py`
+### `tests/test_ingest.py`
 
-- Dado que `OPENAI_API_KEY` e `DATABASE_URL` estão definidas, `embeddings`, `llm` e `vector_store` são instanciados sem erro
+- Dado que `OPENAI_API_KEY` e `DATABASE_URL` estão definidas, `embeddings` e `vector_store` são instanciados sem erro
 - Dado que `OPENAI_API_KEY` está ausente, a inicialização lança exceção com mensagem clara
 - Dado que `DATABASE_URL` está ausente, a inicialização lança exceção com mensagem clara
-
-### `tests/test_ingest_service.py`
 
 - `load_pdf` retorna lista não-vazia de `Document` para um PDF válido
 - `load_pdf` lança `FileNotFoundError` para caminho inexistente
@@ -297,7 +295,7 @@ Cada módulo possui um arquivo de teste correspondente. Dependências externas (
 - `store_embeddings` chama `vector_store.add_documents` com os chunks (mock)
 - `run_ingestion` orquestra as três funções na ordem correta
 
-### `tests/test_search_service.py`
+### `tests/test_search.py`
 
 - `search_chunks` chama `vector_store.similarity_search_with_score` com `k=10` (mock)
 - `search_chunks` lança erro para query vazia
@@ -320,7 +318,7 @@ Cada módulo possui um arquivo de teste correspondente. Dependências externas (
 [x] docs/SPEC.md         ← concluído
 [x] docs/ARCHITECTURE.md ← concluído
 [x] docs/CONTRACTS.md    ← concluído
-[ ] Testes (TDD)         ← tests/test_settings.py, tests/test_ingest_service.py, tests/test_search_service.py, tests/test_chat.py
-[ ] Implementação        ← src/config/settings.py, src/services/*, src/chat.py
+[x] Testes (TDD)         ← tests/test_ingest.py, tests/test_search.py, tests/test_chat.py
+[x] Implementação        ← src/ingest.py, src/search.py, src/chat.py
 [ ] README.md            ← instruções finais de execução
 ```

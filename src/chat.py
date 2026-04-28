@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from services.search_service import answer_question
+from search import answer_question
 
 
 def main() -> None:

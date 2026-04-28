@@ -1,13 +1,30 @@
+import os
 import sys
 from unittest.mock import MagicMock, patch
+
 import pytest
+from langchain_core.documents import Document
 
-# Garante que config.settings esteja em sys.modules antes do import do SUT
-sys.modules.setdefault("config", MagicMock())
-sys.modules.setdefault("config.settings", MagicMock())
+_VALID_ENV = {
+    "OPENAI_API_KEY": "sk-test-key",
+    "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small",
+    "DATABASE_URL": "postgresql+psycopg://user:pass@localhost:5432/testdb",
+    "PG_VECTOR_COLLECTION_NAME": "pdf_documents",
+    "PDF_PATH": "document.pdf",
+}
 
-from services import search_service  # noqa: E402
-from langchain_core.documents import Document  # noqa: E402
+# Remove any stale mock installed by test_chat.py (alphabetically imported first)
+sys.modules.pop("search", None)
+
+# Import search with valid env to prevent module-level errors
+with (
+    patch.dict(os.environ, _VALID_ENV, clear=True),
+    patch("dotenv.load_dotenv"),
+    patch("langchain_openai.OpenAIEmbeddings", return_value=MagicMock()),
+    patch("langchain_openai.ChatOpenAI", return_value=MagicMock()),
+    patch("langchain_postgres.PGVector", return_value=MagicMock()),
+):
+    import search
 
 
 def _make_chunks(n=3):
@@ -19,13 +36,13 @@ def _make_chunks(n=3):
 
 @pytest.fixture
 def mock_vs():
-    with patch.object(search_service, "vector_store") as m:
+    with patch.object(search, "vector_store") as m:
         yield m
 
 
 @pytest.fixture
 def mock_llm():
-    with patch.object(search_service, "llm") as m:
+    with patch.object(search, "llm") as m:
         yield m
 
 
@@ -33,23 +50,23 @@ class TestSearchChunks:
     def test_calls_similarity_search_with_k10(self, mock_vs):
         mock_vs.similarity_search_with_score.return_value = _make_chunks()
 
-        search_service.search_chunks("qual é o tema?")
+        search.search_chunks("qual é o tema?")
 
         mock_vs.similarity_search_with_score.assert_called_once_with("qual é o tema?", k=10)
 
     def test_raises_for_empty_query(self):
         with pytest.raises(ValueError):
-            search_service.search_chunks("")
+            search.search_chunks("")
 
     def test_raises_for_whitespace_only_query(self):
         with pytest.raises(ValueError):
-            search_service.search_chunks("   ")
+            search.search_chunks("   ")
 
 
 class TestBuildPrompt:
     def test_contains_context_and_query(self):
         chunks = _make_chunks(2)
-        prompt = search_service.build_prompt("qual o faturamento?", chunks)
+        prompt = search.build_prompt("qual o faturamento?", chunks)
 
         assert "conteúdo do chunk 0" in prompt
         assert "conteúdo do chunk 1" in prompt
@@ -57,13 +74,13 @@ class TestBuildPrompt:
 
     def test_chunks_separated_by_delimiter(self):
         chunks = _make_chunks(2)
-        prompt = search_service.build_prompt("pergunta", chunks)
+        prompt = search.build_prompt("pergunta", chunks)
 
         assert "---" in prompt
 
     def test_contains_required_template_sections(self):
         chunks = _make_chunks()
-        prompt = search_service.build_prompt("pergunta", chunks)
+        prompt = search.build_prompt("pergunta", chunks)
 
         assert "CONTEXTO:" in prompt
         assert "REGRAS:" in prompt
@@ -72,7 +89,7 @@ class TestBuildPrompt:
 
     def test_raises_for_empty_chunks(self):
         with pytest.raises(ValueError):
-            search_service.build_prompt("pergunta", [])
+            search.build_prompt("pergunta", [])
 
 
 class TestAskLlm:
@@ -81,7 +98,7 @@ class TestAskLlm:
         mock_response.content = "resposta da LLM"
         mock_llm.invoke.return_value = mock_response
 
-        result = search_service.ask_llm("prompt qualquer")
+        result = search.ask_llm("prompt qualquer")
 
         assert result == "resposta da LLM"
         mock_llm.invoke.assert_called_once_with("prompt qualquer")
@@ -94,14 +111,14 @@ class TestAnswerQuestion:
         mock_response.content = "resposta final"
         mock_llm.invoke.return_value = mock_response
 
-        result = search_service.answer_question("qual o tema?")
+        result = search.answer_question("qual o tema?")
 
         assert result == "resposta final"
 
     def test_returns_friendly_message_on_internal_error(self, mock_vs):
         mock_vs.similarity_search_with_score.side_effect = Exception("falha")
 
-        result = search_service.answer_question("qual o tema?")
+        result = search.answer_question("qual o tema?")
 
         assert isinstance(result, str)
         assert len(result) > 0

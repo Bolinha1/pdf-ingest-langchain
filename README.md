@@ -36,12 +36,23 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edite o `.env` com suas credenciais:
+Edite o `.env` com suas credenciais e configurações:
 
 ```env
 OPENAI_API_KEY=sk-...
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/vectordb
+PG_VECTOR_COLLECTION_NAME=pdf_documents
+PDF_PATH=document.pdf
 ```
+
+| Variável | Descrição |
+| --- | --- |
+| `OPENAI_API_KEY` | Chave de API da OpenAI |
+| `OPENAI_EMBEDDING_MODEL` | Modelo de embeddings a utilizar |
+| `DATABASE_URL` | Connection string do PostgreSQL |
+| `PG_VECTOR_COLLECTION_NAME` | Nome da collection no pgVector |
+| `PDF_PATH` | Caminho do PDF a ser ingerido |
 
 > O `.env` está no `.gitignore` e nunca será commitado.
 
@@ -68,12 +79,12 @@ docker compose ps
 Coloque o arquivo `document.pdf` na raiz do projeto e execute:
 
 ```bash
-python src/services/ingest_service.py
+python src/ingest.py
 ```
 
 Saída esperada:
 
-```
+```text
 Carregando PDF: document.pdf
 Páginas carregadas: 12
 Chunks gerados: 47
@@ -93,7 +104,7 @@ python src/chat.py
 
 Saída esperada:
 
-```
+```text
 Sistema de perguntas sobre PDF. Digite 'exit' ou 'quit' para sair.
 
 PERGUNTA: Qual é o tema principal do documento?
@@ -105,7 +116,7 @@ Encerrando. Até logo!
 
 O sistema responde **somente com base no conteúdo do PDF**. Para perguntas fora do escopo:
 
-```
+```text
 PERGUNTA: Qual é a capital da França?
 RESPOSTA: Não tenho informações necessárias para responder sua pergunta.
 ```
@@ -122,7 +133,7 @@ Os testes são unitários e não requerem banco ou chave de API — todas as dep
 
 Saída esperada:
 
-```
+```text
 26 passed in 0.89s
 ```
 
@@ -130,7 +141,7 @@ Saída esperada:
 
 ## Estrutura do projeto
 
-```
+```text
 pdf-ingest-langchain/
 ├── docker-compose.yml        # PostgreSQL + pgVector
 ├── requirements.txt
@@ -139,16 +150,12 @@ pdf-ingest-langchain/
 ├── document.pdf              # PDF a ser ingerido (não versionado)
 ├── docs/                     # Especificações do projeto
 ├── src/
-│   ├── config/
-│   │   └── settings.py       # Clientes OpenAI e PGVector
-│   ├── services/
-│   │   ├── ingest_service.py # Ingestão do PDF
-│   │   └── search_service.py # Busca e resposta via LLM
+│   ├── ingest.py             # Ingestão do PDF
+│   ├── search.py             # Busca e resposta via LLM
 │   └── chat.py               # Entrypoint CLI
 └── tests/
-    ├── test_settings.py
-    ├── test_ingest_service.py
-    ├── test_search_service.py
+    ├── test_ingest.py
+    ├── test_search.py
     └── test_chat.py
 ```
 
@@ -158,8 +165,8 @@ pdf-ingest-langchain/
 
 | Função     | Modelo                  |
 |------------|-------------------------|
-| Embeddings | `text-embedding-3-small` |
-| LLM        | `gpt-5-nano`            |
+| Embeddings | `text-embedding-3-small`  |
+| LLM        | `gpt-4o-mini`             |
 
 ---
 
